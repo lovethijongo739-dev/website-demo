@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Surveys — SolEarn</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css"/>
+  <style>
+    .survey-card-full {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      box-shadow: var(--shadow);
+      margin-bottom: 14px;
+      transition: all 0.2s;
+    }
+    .survey-card-full:hover { box-shadow: var(--shadow-md); border-color: #C4A0FF; }
+    .survey-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 12px; }
+    .survey-main { flex: 1; }
+    .survey-tag { display: inline-block; background: var(--purple-light); color: var(--sol-purple); font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; margin-bottom: 8px; }
+    .survey-tag.crypto { background: #E6FFF5; color: #0a7a4a; }
+    .survey-tag.gaming { background: #EFF6FF; color: #1d4ed8; }
+    .survey-tag.lifestyle { background: var(--amber-light); color: #b45309; }
+    .s-title { font-size: 16px; font-weight: 600; margin-bottom: 5px; }
+    .s-desc { font-size: 13px; color: var(--text2); line-height: 1.5; margin-bottom: 10px; }
+    .s-meta-row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+    .s-meta-item { font-size: 12px; color: var(--text3); display: flex; align-items: center; gap: 4px; }
+    .s-right { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; text-align: right; flex-shrink: 0; }
+    .s-reward-big { font-size: 20px; font-weight: 700; color: var(--sol-purple); font-family: var(--font-mono); }
+    .survey-bottom { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .slots-left { font-size: 12px; color: var(--text3); }
+    .slots-left span { color: var(--red); font-weight: 600; }
+    /* Modal */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 200; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--surface); border-radius: var(--radius-lg); padding: 28px; max-width: 520px; width: 90%; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
+    .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+    .modal-sub { font-size: 13px; color: var(--text2); margin-bottom: 20px; }
+    .q-block { margin-bottom: 20px; }
+    .q-label { font-size: 14px; font-weight: 600; margin-bottom: 10px; }
+    .q-options { display: flex; flex-direction: column; gap: 8px; }
+    .q-option { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; transition: all 0.15s; font-size: 14px; }
+    .q-option:hover { border-color: var(--sol-purple); background: var(--purple-light); }
+    .q-option input { accent-color: var(--sol-purple); }
+    .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+  </style>
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo"><div class="logo-mark">◎</div><span class="logo-text">SolEarn</span></div>
+    <nav class="sidebar-nav">
+      <div class="nav-group-label">Earn</div>
+      <a href="index.html" class="nav-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h1v7c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-7h1c.55 0 .99-.45.99-1s-.44-1-.99-1L12 2 2 11c-.55 0-1 .45-1 1s.45 1 1 1z"/></svg>Dashboard</a>
+      <a href="tasks.html" class="nav-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>Crypto Tasks<span class="nav-badge">12</span></a>
+      <a href="surveys.html" class="nav-item active"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>Surveys<span class="nav-badge">8</span></a>
+      <a href="videos.html" class="nav-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M10 16.5l6-4.5-6-4.5v9zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>Watch Videos</a>
+      <div class="nav-group-label">Account</div>
+      <a href="wallet.html" class="nav-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>Wallet</a>
+      <a href="referral.html" class="nav-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>Referral</a>
+      <a href="#" class="nav-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>Settings</a>
+    </nav>
+    <div class="sidebar-bottom"><div class="sol-balance-pill"><span class="sol-icon">◎</span><span class="sol-amount">4.82 SOL</span></div></div>
+  </aside>
+
+  <header class="topbar">
+    <button class="menu-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg></button>
+    <div class="topbar-search"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" style="opacity:0.4"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg><input type="text" placeholder="Search surveys..."/></div>
+    <div class="topbar-right"><button class="notif-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg><span class="notif-dot"></span></button><div class="user-avatar">JD</div></div>
+  </header>
+
+  <main class="main-content">
+    <div class="page-header">
+      <div><h1 class="page-title">Surveys</h1><p class="page-subtitle">Share your opinion and earn <strong>SOL</strong></p></div>
+    </div>
+
+    <div class="filter-tabs">
+      <div class="filter-tab active" onclick="setFilter('all',this)">All</div>
+      <div class="filter-tab" onclick="setFilter('crypto',this)">Crypto</div>
+      <div class="filter-tab" onclick="setFilter('gaming',this)">Gaming</div>
+      <div class="filter-tab" onclick="setFilter('lifestyle',this)">Lifestyle</div>
+    </div>
+
+    <div id="surveys-container">
+      <div class="survey-card-full" data-cat="crypto">
+        <div class="survey-top">
+          <div class="survey-main">
+            <span class="survey-tag crypto">Crypto</span>
+            <div class="s-title">Crypto usage habits — Q2 2025</div>
+            <div class="s-desc">Tell us about your crypto trading frequency, preferred platforms, and investment strategies.</div>
+            <div class="s-meta-row">
+              <div class="s-meta-item">⏱ ~8 min</div>
+              <div class="s-meta-item">👥 1,204 responses</div>
+              <div class="s-meta-item">📅 Closes in 2 days</div>
+            </div>
+          </div>
+          <div class="s-right">
+            <div class="s-reward-big">0.10 SOL</div>
+            <button class="btn-primary btn-sm" onclick="openSurvey('crypto-habits','0.10')">Take Survey</button>
+          </div>
+        </div>
+        <div class="survey-bottom">
+          <div class="slots-left">Only <span>47</span> slots remaining</div>
+          <div class="progress-wrap" style="width:200px"><div class="progress-fill" style="width:72%"></div></div>
+        </div>
+      </div>
+
+      <div class="survey-card-full" data-cat="crypto">
+        <div class="survey-top">
+          <div class="survey-main">
+            <span class="survey-tag crypto">DeFi</span>
+            <div class="s-title">DeFi platform user experience study</div>
+            <div class="s-desc">Rate your experience with decentralized finance platforms and help shape the future of DeFi UX.</div>
+            <div class="s-meta-row">
+              <div class="s-meta-item">⏱ ~20 min</div>
+              <div class="s-meta-item">👥 320 responses</div>
+              <div class="s-meta-item">📅 Closes in 5 days</div>
+            </div>
+          </div>
+          <div class="s-right">
+            <div class="s-reward-big">0.25 SOL</div>
+            <button class="btn-primary btn-sm" onclick="openSurvey('defi-ux','0.25')">Take Survey</button>
+          </div>
+        </div>
+        <div class="survey-bottom">
+          <div class="slots-left">Only <span>123</span> slots remaining</div>
+          <div class="progress-wrap" style="width:200px"><div class="progress-fill" style="width:30%"></div></div>
+        </div>
+      </div>
+
+      <div class="survey-card-full" data-cat="crypto">
+        <div class="survey-top">
+          <div class="survey-main">
+            <span class="survey-tag">NFT</span>
+            <div class="s-title">NFT buying preferences</div>
+            <div class="s-desc">What motivates you to buy or avoid NFTs? Share your preferences and pain points.</div>
+            <div class="s-meta-row">
+              <div class="s-meta-item">⏱ ~5 min</div>
+              <div class="s-meta-item">👥 876 responses</div>
+              <div class="s-meta-item">📅 Closes in 1 day</div>
+            </div>
+          </div>
+          <div class="s-right">
+            <div class="s-reward-big">0.06 SOL</div>
+            <button class="btn-primary btn-sm" onclick="openSurvey('nft-prefs','0.06')">Take Survey</button>
+          </div>
+        </div>
+        <div class="survey-bottom">
+          <div class="slots-left">Only <span>12</span> slots remaining</div>
+          <div class="progress-wrap" style="width:200px"><div class="progress-fill" style="width:88%"></div></div>
+        </div>
+      </div>
+
+      <div class="survey-card-full" data-cat="gaming">
+        <div class="survey-top">
+          <div class="survey-main">
+            <span class="survey-tag gaming">Gaming</span>
+            <div class="s-title">Web3 gaming interest survey</div>
+            <div class="s-desc">Do you play blockchain games? Tell us what you enjoy, what you dislike, and what would make you play more.</div>
+            <div class="s-meta-row">
+              <div class="s-meta-item">⏱ ~12 min</div>
+              <div class="s-meta-item">👥 540 responses</div>
+              <div class="s-meta-item">📅 Closes in 3 days</div>
+            </div>
+          </div>
+          <div class="s-right">
+            <div class="s-reward-big">0.18 SOL</div>
+            <button class="btn-primary btn-sm" onclick="openSurvey('web3-gaming','0.18')">Take Survey</button>
+          </div>
+        </div>
+        <div class="survey-bottom">
+          <div class="slots-left">Only <span>65</span> slots remaining</div>
+          <div class="progress-wrap" style="width:200px"><div class="progress-fill" style="width:55%"></div></div>
+        </div>
+      </div>
+
+      <div class="survey-card-full" data-cat="lifestyle">
+        <div class="survey-top">
+          <div class="survey-main">
+            <span class="survey-tag lifestyle">Lifestyle</span>
+            <div class="s-title">Remote work and digital finance habits</div>
+            <div class="s-desc">How has remote work changed your relationship with money and digital payments?</div>
+            <div class="s-meta-row">
+              <div class="s-meta-item">⏱ ~10 min</div>
+              <div class="s-meta-item">👥 210 responses</div>
+              <div class="s-meta-item">📅 Closes in 7 days</div>
+            </div>
+          </div>
+          <div class="s-right">
+            <div class="s-reward-big">0.12 SOL</div>
+            <button class="btn-primary btn-sm" onclick="openSurvey('remote-finance','0.12')">Take Survey</button>
+          </div>
+        </div>
+        <div class="survey-bottom">
+          <div class="slots-left"><span>200</span> slots remaining</div>
+          <div class="progress-wrap" style="width:200px"><div class="progress-fill" style="width:18%"></div></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- SURVEY MODAL -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div class="modal-title" id="modal-title">Survey</div>
+      <div class="modal-sub">Answer all questions honestly to receive your SOL reward.</div>
+      <div class="q-block">
+        <div class="q-label">1. How often do you trade crypto?</div>
+        <div class="q-options">
+          <label class="q-option"><input type="radio" name="q1" value="daily"> Daily</label>
+          <label class="q-option"><input type="radio" name="q1" value="weekly"> Weekly</label>
+          <label class="q-option"><input type="radio" name="q1" value="monthly"> Monthly</label>
+          <label class="q-option"><input type="radio" name="q1" value="rarely"> Rarely or never</label>
+        </div>
+      </div>
+      <div class="q-block">
+        <div class="q-label">2. Which Solana wallet do you use most?</div>
+        <div class="q-options">
+          <label class="q-option"><input type="radio" name="q2" value="phantom"> Phantom</label>
+          <label class="q-option"><input type="radio" name="q2" value="solflare"> Solflare</label>
+          <label class="q-option"><input type="radio" name="q2" value="backpack"> Backpack</label>
+          <label class="q-option"><input type="radio" name="q2" value="other"> Other</label>
+        </div>
+      </div>
+      <div class="q-block">
+        <div class="q-label">3. What is your main reason for using DeFi?</div>
+        <div class="q-options">
+          <label class="q-option"><input type="radio" name="q3" value="yield"> Yield / staking returns</label>
+          <label class="q-option"><input type="radio" name="q3" value="trading"> Trading / swapping</label>
+          <label class="q-option"><input type="radio" name="q3" value="access"> Access to financial services</label>
+          <label class="q-option"><input type="radio" name="q3" value="explore"> Just exploring</label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-ghost" onclick="closeModal()">Cancel</button>
+        <button class="btn-primary" onclick="submitSurvey()">Submit & Earn SOL →</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="js/app.js"></script>
+  <script>
+    let currentReward = '0';
+    function openSurvey(id, reward) { currentReward = reward; document.getElementById('modal-title').textContent = 'Quick Survey — ' + reward + ' SOL reward'; document.getElementById('modal').classList.add('open'); }
+    function closeModal() { document.getElementById('modal').classList.remove('open'); }
+    function submitSurvey() { closeModal(); showToast('✅ Survey submitted! +' + currentReward + ' SOL added to your balance'); }
+    function setFilter(cat, el) { document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active')); el.classList.add('active'); document.querySelectorAll('.survey-card-full').forEach(c => { c.style.display = (cat === 'all' || c.dataset.cat === cat) ? '' : 'none'; }); }
+  </script>
+</body>
+</html>
